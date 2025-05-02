@@ -25,7 +25,7 @@ export const NotificationDisplay = () => {
   const [settings, setSettings] = useAtom(settingsAtom);
   return (
     <Stack sx={{ mt: 2, px: 3, height: "100%", gap: 2, minHeight: "100vh" }}>
-      <Box display="flex" justifyContent="space-between">
+      <Box display="flex" justifyContent="space-between" alignItems="center">
         <Typography variant="h4" mr={1}>
           History
         </Typography>
@@ -50,6 +50,7 @@ export const NotificationDisplay = () => {
                 onChange={(e) =>
                   setSettings((p) => ({ ...p, compactView: e.target.checked }))
                 }
+                size="small"
               />
             }
             label="Compact"

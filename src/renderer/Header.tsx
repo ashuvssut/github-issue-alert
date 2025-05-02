@@ -40,12 +40,14 @@ export const configAtom = atomWithStorage("config", {
 
 export function Header() {
   const [config, setConfig] = useAtom(configAtom);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const isValidConfig = useMemo(() => {
     const schema = getConfigSchema(config.token);
     const result = schema.safeParse(config);
     return result.success;
   }, [config]);
+
   const {
     lastChecked,
     isRunning,
@@ -55,18 +57,17 @@ export function Header() {
     loading,
     error,
   } = useNotifications();
+
   useEffect(() => {
-    // AUTO START check is values are valid
     if (isValidConfig) startIssueChecking();
   }, [isValidConfig, config]);
 
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const handleChange = (key: keyof typeof config, val: string | number) => {
-    const value = key === "interval" ? Number(val) : val;
-    const updatedConfig = { ...config, [key]: value };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    const updatedValue = id === "interval" ? Number(value) : value;
+    const updatedConfig = { ...config, [id]: updatedValue };
     setConfig(updatedConfig);
 
-    // Set errors
     const schema = getConfigSchema(updatedConfig.token);
     const result = schema.safeParse(updatedConfig);
     if (!result.success) {
@@ -82,40 +83,39 @@ export function Header() {
       startIssueChecking();
     }
   };
+
+  const fields = [
+    { id: "token", label: "Authorization Token", type: "text" },
+    { id: "repo", label: "Repo URL", type: "url" },
+    { id: "interval", label: "Polling Interval (s)", type: "number" },
+  ] as const;
+
   return (
     <Paper>
       <Stack sx={{ gap: 2, py: 2 }}>
         <Container
           sx={{ display: "flex", gap: 2, px: 2, alignItems: "center" }}
         >
-          <TextField
-            label="Authorization Token"
-            variant="standard"
-            value={config.token}
-            onChange={(e) => handleChange("token", e.target.value)}
-            error={!!fieldErrors.token}
-            helperText={fieldErrors.token}
-          />
-          <TextField
-            label="Repo URL"
-            variant="standard"
-            type="url"
-            value={config.repo}
-            onChange={(e) => handleChange("repo", e.target.value)}
-            error={!!fieldErrors.repo}
-            helperText={fieldErrors.repo}
-          />
-          <TextField
-            label="Polling Interval (s)"
-            type="number"
-            variant="standard"
-            slotProps={{ htmlInput: { min: config.token ? 1 : 60 } }}
-            value={config.interval}
-            onChange={(e) => handleChange("interval", e.target.value)}
-            error={!!fieldErrors.interval}
-            helperText={fieldErrors.interval}
-          />
+          {fields.map((field) => (
+            <TextField
+              key={field.id}
+              id={field.id}
+              label={field.label}
+              variant="standard"
+              type={field.type}
+              value={config[field.id]}
+              onChange={handleChange}
+              error={!!fieldErrors[field.id]}
+              helperText={fieldErrors[field.id]}
+              slotProps={
+                field.id === "interval"
+                  ? { htmlInput: { min: config.token ? 1 : 60 } }
+                  : undefined
+              }
+            />
+          ))}
         </Container>
+
         <Container
           sx={{ display: "flex", gap: 2, px: 2, alignItems: "center" }}
         >
@@ -129,7 +129,6 @@ export function Header() {
           >
             {isRunning ? "Stop" : "Start"}
           </Button>
-
           <Typography variant="overline">
             Status: Polling {isRunning ? "Active" : "Stopped"}
           </Typography>
@@ -142,12 +141,11 @@ export function Header() {
             variant="text"
             loadingPosition="end"
             startIcon={<Refresh />}
-            onClick={() => checkNewIssue()}
+            onClick={checkNewIssue}
           >
             Refresh
           </Button>
           {lastChecked && <Typography>Last checked: {lastChecked}</Typography>}
-
           {loading && (
             <>
               <CircularProgress size={20} />
@@ -155,6 +153,7 @@ export function Header() {
             </>
           )}
         </Container>
+
         {error && (
           <Typography color="error" sx={{ px: 4, fontSize: 13 }}>
             {error}
