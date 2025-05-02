@@ -2,20 +2,20 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, ipcRenderer } from "electron";
-import {
+import type {
   ExectueCommand,
   SerializedFetch,
   ShowIssueNotification,
-} from "./server";
+} from "./server/ipcHandlers";
 
 contextBridge.exposeInMainWorld("electronAPI", {
   executeCommand: (command: Parameters<ExectueCommand>[0]) =>
-    ipcRenderer.invoke("execute-command", command),
+    ipcRenderer.invoke("executeCommand", command),
   ipcFetch: (...args: Parameters<SerializedFetch>) =>
-    ipcRenderer.invoke("ipc-fetch", ...args),
-  openUrl: (url: string) => ipcRenderer.invoke("open-url", url),
+    ipcRenderer.invoke("ipcFetch", ...args),
+  openUrl: (url: string) => ipcRenderer.invoke("openUrl", url),
   showIssueNotification: (args: Parameters<ShowIssueNotification>[0]) =>
-    ipcRenderer.invoke("show-issue-notification", args),
+    ipcRenderer.invoke("showIssueNotification", args),
 });
 
 declare global {
