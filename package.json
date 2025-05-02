@@ -5,10 +5,10 @@
   "description": "My Electron application description",
   "main": ".webpack/main",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
+    "start": "NODE_ENV=dev electron-forge start",
+    "package": "NODE_ENV=prod electron-forge package",
+    "make": "NODE_ENV=prod electron-forge make",
+    "publish": "NODE_ENV=prod electron-forge publish",
     "lint": "eslint --ext .ts,.tsx ."
   },
   "keywords": [],

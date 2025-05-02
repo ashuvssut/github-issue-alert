@@ -15,7 +15,10 @@
       // runtimeArgs will be passed directly to your Electron application
       // "runtimeArgs": ["foo", "bar"],
       "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "dev"
+      }
     }
   ]
 }
