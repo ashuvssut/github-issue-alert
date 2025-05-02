@@ -1,8 +1,8 @@
 {
-  "name": "github-issue-alertz",
-  "productName": "github-issue-alertz",
+  "name": "github-issue-alert",
+  "productName": "GitHub Issue Alert",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "A desktop app that polls GitHub for new issues in public repositories and sends instant alerts when they're created.",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
