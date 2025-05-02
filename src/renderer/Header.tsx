@@ -62,26 +62,30 @@ export function Header() {
     if (isValidConfig) startIssueChecking();
   }, [isValidConfig, config]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    const updatedValue = id === "interval" ? Number(value) : value;
-    const updatedConfig = { ...config, [id]: updatedValue };
-    setConfig(updatedConfig);
+  const handleChange = (id: string, rawValue: string) => {
+    const updatedValue = id === "interval" ? Number(rawValue) : rawValue;
 
-    const schema = getConfigSchema(updatedConfig.token);
-    const result = schema.safeParse(updatedConfig);
-    if (!result.success) {
-      const newFieldErrors: Record<string, string> = {};
-      result.error.issues.forEach((issue) => {
-        const field = issue.path[0] as string;
-        newFieldErrors[field] = issue.message;
-      });
-      setFieldErrors(newFieldErrors);
-      stopIssueChecking();
-    } else {
-      setFieldErrors({});
-      startIssueChecking();
-    }
+    setConfig((prev) => {
+      const updatedConfig = { ...prev, [id]: updatedValue };
+
+      const schema = getConfigSchema(updatedConfig.token);
+      const result = schema.safeParse(updatedConfig);
+
+      if (!result.success) {
+        const newFieldErrors: Record<string, string> = {};
+        result.error.issues.forEach((issue) => {
+          const field = issue.path[0] as string;
+          newFieldErrors[field] = issue.message;
+        });
+        setFieldErrors(newFieldErrors);
+        stopIssueChecking();
+      } else {
+        setFieldErrors({});
+        startIssueChecking();
+      }
+
+      return updatedConfig;
+    });
   };
 
   const fields = [
@@ -104,7 +108,7 @@ export function Header() {
               variant="standard"
               type={field.type}
               value={config[field.id]}
-              onChange={handleChange}
+              onChange={(e) => handleChange(e.target.id, e.target.value)}
               error={!!fieldErrors[field.id]}
               helperText={fieldErrors[field.id]}
               slotProps={
