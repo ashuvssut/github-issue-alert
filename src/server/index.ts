@@ -8,7 +8,8 @@ const execPromise = util.promisify(exec);
 const executeCommand = async (command: string) => {
   try {
     const { stdout, stderr } = await execPromise(command);
-    return { stdout, stderr };
+    if (stderr) throw new Error(stderr);
+    return { stdout };
   } catch (error: any) {
     return { error: error.message };
   }
