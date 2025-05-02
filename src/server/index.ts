@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain, shell } from "electron";
 import { exec } from "child_process";
 import util from "util";
 import fetch, { RequestInit, RequestInfo, Headers } from "node-fetch";
@@ -67,3 +67,7 @@ ipcMain.handle(
     return serializedFetch(url, init, bodyParser);
   }
 );
+
+ipcMain.handle("open-url", (_event, url: string) => {
+  shell.openExternal(url);
+});

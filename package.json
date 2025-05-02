@@ -57,8 +57,12 @@
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
     "electron-squirrel-startup": "^1.0.1",
+    "jotai": "^2.12.3",
+    "lodash": "^4.17.21",
     "node-fetch": "^3.3.2",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-toastify": "^11.0.5",
+    "zod": "^3.24.3"
   }
 }

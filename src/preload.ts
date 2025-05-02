@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("execute-command", command),
   ipcFetch: (...args: Parameters<SerializedFetch>) =>
     ipcRenderer.invoke("ipc-fetch", ...args),
+  openUrl: (url: string) => ipcRenderer.invoke("open-url", url),
 });
 
 declare global {
@@ -16,6 +17,7 @@ declare global {
     electronAPI: {
       executeCommand: ExectueCommand;
       ipcFetch: SerializedFetch;
+      openUrl: (url: string) => void;
     };
   }
 }
