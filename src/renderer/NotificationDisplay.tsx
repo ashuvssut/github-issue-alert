@@ -20,9 +20,10 @@ import { getContrastColors } from "./utils";
 
 const settingsAtom = atomWithStorage("settings", { compactView: false });
 export const NotificationDisplay = () => {
-  const { history, deleteNotification, clearHistory, repo } =
+  const { history, deleteNotification, clearHistory, issuesByCreatedAtLink } =
     useNotifications();
   const [settings, setSettings] = useAtom(settingsAtom);
+
   return (
     <Stack sx={{ mt: 2, px: 3, height: "100%", gap: 2, minHeight: "100vh" }}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -32,9 +33,7 @@ export const NotificationDisplay = () => {
         <IconButton
           onClick={(e) => {
             e.stopPropagation();
-            window.electronAPI.openUrl(
-              `https://github.com/${repo.owner}/${repo.name}/issues?q=is%3Aissue%20is%3Aopen%20%20sort%3Acreated-desc`
-            );
+            window.electronAPI.openUrl(issuesByCreatedAtLink);
           }}
         >
           <OpenInNew />

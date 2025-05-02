@@ -22,7 +22,8 @@ let etag: string | null = null;
 export const useNotifications = () => {
   const [notifications, setNotifications] = useAtom(notificationsAtom);
 
-  const { config, repo, getIssues, getRepoOwnerInfo } = useGitHubApi();
+  const { config, repo, getIssues, getRepoOwnerInfo, issuesByCreatedAtLink } =
+    useGitHubApi();
 
   const [ownerInfo, setOwnerInfo] = useState<GitHubOwner | null>(null);
   useEffect(() => {
@@ -32,9 +33,19 @@ export const useNotifications = () => {
 
   async function handleNewIssue(latestIssue: GitHubIssueAndPR) {
     try {
-      const command = createTerminalNotifierCommand(latestIssue, ownerInfo);
-      const { error } = await window.electronAPI.executeCommand(command);
-      if (error) throw new Error(error);
+      // const command = createTerminalNotifierCommand(latestIssue, ownerInfo);
+      // const { error } = await window.electronAPI.executeCommand(command);
+      // if (error) throw new Error(error);
+      const labels = latestIssue.labels
+        .map((label) => (typeof label === "string" ? label : label.name))
+        .join(", ");
+      window.electronAPI.showIssueNotification({
+        title: latestIssue.title,
+        body: `${latestIssue.user.login} | ${labels}`,
+        openUrl: latestIssue.html_url,
+        issuesByCreatedAtLink,
+        iconUrl: ownerInfo?.avatar_url,
+      });
     } catch (err: any) {
       console.error("Notification failed:", err.message);
       setNotifications((prev) => ({
@@ -143,6 +154,7 @@ export const useNotifications = () => {
     deleteNotification,
     clearHistory,
     repo,
+    issuesByCreatedAtLink,
   };
 };
 
@@ -191,11 +203,13 @@ const useGitHubApi = () => {
     }
   };
 
+  const issuesByCreatedAtLink = `https://github.com/${owner}/${repoName}/issues?q=is%3Aissue%20is%3Aopen%20%20sort%3Acreated-desc`;
   return {
     getIssues,
     getRepoOwnerInfo,
     repo: { url: config.repo, owner, name: repoName },
     config,
+    issuesByCreatedAtLink,
   };
 };
 
