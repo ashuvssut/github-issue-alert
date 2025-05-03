@@ -20,6 +20,7 @@ const config: ForgeConfig = {
       NSUserNotificationAlertStyle: "alert",
     },
     osxSign: {},
+    executableName: "github-issue-alert",
   },
   rebuildConfig: {},
   makers: [
