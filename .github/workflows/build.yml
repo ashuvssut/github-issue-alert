@@ -1,9 +1,9 @@
 name: Cross-Platform Electron Build
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_call:
+  repository_dispatch:
+    types: [trigger-electron-build]
 
 jobs:
   build-macos:
