@@ -1,0 +1,25 @@
+name: Version and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  version:
+    if: github.repository == 'ashuvssut/github-issue-alert' # optional, to avoid forks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Create Release Pull Request or Publish
+        uses: changesets/action@v1
+        with:
+          publish: yarn release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
