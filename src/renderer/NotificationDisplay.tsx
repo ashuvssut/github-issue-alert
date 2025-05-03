@@ -56,7 +56,7 @@ export const NotificationDisplay = () => {
         </FormGroup>
       </Box>
       <Stack sx={{ height: "100%", gap: 2, overflow: "auto" }}>
-        {history.map((ghIssue) => {
+        {history.map((ghIssue, i) => {
           const createdAt = new Date(ghIssue.created_at).toLocaleString(
             "en-US",
             {
@@ -68,77 +68,94 @@ export const NotificationDisplay = () => {
               weekday: "short",
             }
           );
+          const [owner, repo] = ghIssue.repository_url.split("/").slice(-2);
+          const repoName = `${owner}/${repo}`;
+          const showDivider =
+            i == 0 || ghIssue.repository_url !== history[i - 1]?.repository_url;
           return (
-            <Tooltip title={`Open ${ghIssue.html_url}`} key={ghIssue.id}>
-              <Card
-                onClick={() => window.electronAPI.openUrl(ghIssue.html_url)}
-                sx={{
-                  cursor: "pointer",
-                  minHeight: "fit-content",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 2,
-                  bgcolor: "background.paper",
-                  gap: 1,
-                  pr: 1,
-                }}
-              >
-                <CardContent
-                  sx={{ maxWidth: "calc(100% - 2 * 8px - 40px)", mr: "auto" }}
-                >
-                  <Typography gutterBottom variant="subtitle1" fontWeight={600}>
-                    {ghIssue.title}
-                  </Typography>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: "text.secondary" }}
-                    gap={1}
-                    display="flex"
-                    alignItems="center"
-                    gutterBottom
-                  >
-                    {createdAt} | {ghIssue.user.login} |{" "}
-                    {ghIssue.labels.map((l) => {
-                      if (typeof l === "string") return l;
-                      return (
-                        <Chip
-                          key={l.id}
-                          label={l.name}
-                          variant="outlined"
-                          sx={getContrastColors(l.color)}
-                          onClick={() => window.electronAPI.openUrl(l.url)}
-                        />
-                      );
-                    })}
-                  </Typography>
-                  {!settings.compactView && ghIssue.body && (
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        display: "-webkit-box",
-                        overflow: "hidden",
-                        WebkitBoxOrient: "vertical",
-                        WebkitLineClamp: 2,
-                        color: "text.secondary",
-                      }}
-                    >
-                      {ghIssue.body}
-                    </Typography>
-                  )}
-                </CardContent>
-                <Divider orientation="vertical" variant="middle" flexItem />
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteNotification(ghIssue.id);
+            <>
+              {showDivider && (
+                <Box display="flex" alignItems="center">
+                  <Chip label={repoName} size="small" />
+                  <Divider sx={{ flex: 1, ml: 2 }} />
+                </Box>
+              )}
+              <Tooltip title={`Open ${ghIssue.html_url}`} key={ghIssue.id}>
+                <Card
+                  onClick={() => window.electronAPI.openUrl(ghIssue.html_url)}
+                  sx={{
+                    cursor: "pointer",
+                    minHeight: "fit-content",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 2,
+                    bgcolor: "background.paper",
+                    gap: 1,
+                    pr: 1,
                   }}
                 >
-                  <Delete />
-                </IconButton>
-              </Card>
-            </Tooltip>
+                  <CardContent
+                    sx={{ maxWidth: "calc(100% - 2 * 8px - 40px)", mr: "auto" }}
+                  >
+                    <Typography
+                      gutterBottom
+                      variant="subtitle1"
+                      fontWeight={600}
+                    >
+                      {ghIssue.title}
+                    </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ color: "text.secondary" }}
+                      gap={1}
+                      display="flex"
+                      alignItems="center"
+                      gutterBottom
+                    >
+                      {createdAt} | {ghIssue.user.login}
+                      {ghIssue.labels.length > 0 && " | "}
+                      {ghIssue.labels.map((l) => {
+                        if (typeof l === "string") return l;
+                        return (
+                          <Chip
+                            key={l.id}
+                            label={l.name}
+                            variant="outlined"
+                            sx={getContrastColors(l.color)}
+                            onClick={() => window.electronAPI.openUrl(l.url)}
+                          />
+                        );
+                      })}
+                    </Typography>
+                    {!settings.compactView && ghIssue.body && (
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          display: "-webkit-box",
+                          overflow: "hidden",
+                          WebkitBoxOrient: "vertical",
+                          WebkitLineClamp: 2,
+                          color: "text.secondary",
+                        }}
+                      >
+                        {ghIssue.body}
+                      </Typography>
+                    )}
+                  </CardContent>
+                  <Divider orientation="vertical" variant="middle" flexItem />
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteNotification(ghIssue.id);
+                    }}
+                  >
+                    <Delete />
+                  </IconButton>
+                </Card>
+              </Tooltip>
+            </>
           );
         })}
 
