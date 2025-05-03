@@ -1,0 +1,10 @@
+# github-issue-alert
+
+## 1.0.0
+
+### Major Changes
+
+- 3f2c2f4: First release of GitHub Issue Alerts app
+
+  - Only tested with macOS
+  - App is not signed or notarized. So make sure to follow REAME.md Installation section.
