@@ -4,7 +4,12 @@ on:
   workflow_call:
   repository_dispatch:
     types: [trigger-electron-build]
-
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to build for (e.g., v1.2.3)'
+        required: true
+        default: 'v'
 jobs:
   build-macos:
     runs-on: macos-latest
@@ -34,7 +39,7 @@ jobs:
       - name: Upload artifact to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.client_payload.tag }}
+          tag_name: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
           files: |
             out/make/**/*.zip
             out/make/**/*.dmg
@@ -66,7 +71,7 @@ jobs:
       - name: Upload artifact to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.client_payload.tag }}
+          tag_name: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
           files: |
             out/make/**/*.AppImage
             out/make/**/*.deb
@@ -91,6 +96,7 @@ jobs:
           git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
       - name: Install dependencies with retry # Retry logic for Windows because of network issues
+        shell: bash
         run: |
           for i in 1 2 3; do
             yarn install --frozen-lockfile && break || sleep 10
@@ -102,7 +108,7 @@ jobs:
       - name: Upload artifact to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.client_payload.tag }}
+          tag_name: ${{ github.event.client_payload.tag || github.event.inputs.tag }}
           files: |
             out/make/**/*.exe
             out/make/**/*.zip
