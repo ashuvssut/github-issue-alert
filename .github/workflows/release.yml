@@ -26,18 +26,26 @@ jobs:
       - run: yarn install --frozen-lockfile
 
       - name: Create Release Pull Request or Publish
+        id: changesets
         uses: changesets/action@v1
-        with:
-          publish: yarn release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create Tag and Push
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: |
+          yarn changeset tag
+          git push --follow-tags
+
       - name: Get latest Git tag
+        if: steps.changesets.outputs.hasChangesets == 'false'
         id: get_tag
         run: |
-          echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+          tag=$(git describe --tags --abbrev=0 || echo "No tags found")
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: Trigger Electron Build
+        if: steps.changesets.outputs.hasChangesets == 'false' && steps.get_tag.outputs.tag != 'No tags found'
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
