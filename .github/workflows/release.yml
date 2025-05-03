@@ -9,10 +9,11 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   version:
-    if: github.repository == 'ashuvssut/github-issue-alert' # optional, to avoid forks
+    if: github.repository == 'ashuvssut/github-issue-alert'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -30,9 +31,18 @@ jobs:
           publish: yarn release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
+
+      - name: Get latest Git tag
+        id: get_tag
+        run: |
+          echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+
       - name: Trigger Electron Build
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           event-type: trigger-electron-build
+          client-payload: |
+            {
+              "tag": "${{ steps.get_tag.outputs.tag }}"
+            }

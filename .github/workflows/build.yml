@@ -34,7 +34,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: macos-${{ matrix.arch }}
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ github.event.client_payload.tag }}
           files: |
             out/make/**/*.zip
             out/make/**/*.dmg
@@ -66,7 +66,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: linux-x64
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ github.event.client_payload.tag }}
           files: |
             out/make/**/*.AppImage
             out/make/**/*.deb
@@ -99,7 +99,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: windows-x64
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ github.event.client_payload.tag }}
           files: |
             out/make/**/*.exe
             out/make/**/*.zip
