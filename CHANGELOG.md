@@ -1,5 +1,14 @@
 # github-issue-alert
 
+## 1.0.3
+
+### Patch Changes
+
+- 547cfc8: - feat: separate history entries by repoName using Divider
+  - fix: sort notifications by repo & created_at
+  - fix: incorrect owner avatar on repoUrl change
+  - fix: notification not clearing on CLEAR ALL
+
 ## 1.0.2
 
 ### Patch Changes
