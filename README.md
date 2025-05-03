@@ -35,6 +35,6 @@ Built using **Electron** and **React**.
    sudo codesign --deep --force --sign - "/Applications/GitHub Issue Alert.app"
    ```
 
-Once these steps are completed, the app should function normally and send GitHub issue alerts as expected.
+Once these steps are completed, restart the app and it should function normally and send GitHub issue alerts as expected.
 
 
