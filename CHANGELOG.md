@@ -1,5 +1,11 @@
 # github-issue-alert
 
+## 1.0.1
+
+### Patch Changes
+
+- 3ed6160: UI Improvements
+
 ## 1.0.0
 
 ### Major Changes
