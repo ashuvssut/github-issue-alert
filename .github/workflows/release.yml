@@ -28,17 +28,21 @@ jobs:
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
+        with:
+          publish: |
+            yarn changeset tag
+            git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Tag and Push
-        if: steps.changesets.outputs.hasChangesets == 'false'
-        run: |
-          yarn changeset tag
-          git push --follow-tags
+      # - name: Create Tag and Push
+      #   if: steps.changesets.outputs.hasChangesets == 'false'
+      #   run: |
+      #     yarn changeset tag
+      #     git push --follow-tags
 
       - name: Get latest Git tag
-        if: steps.changesets.outputs.hasChangesets == 'false'
+        if: steps.changesets.outputs.hasChangesets == 'false' # If hasChangesets == 'false', then changesets is in Publish mode
         id: get_tag
         run: |
           tag=$(git describe --tags --abbrev=0 || echo "No tags found")
