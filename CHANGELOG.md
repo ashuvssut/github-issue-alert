@@ -1,5 +1,11 @@
 # github-issue-alert
 
+## 1.0.2
+
+### Patch Changes
+
+- 659b4be: CI for build and release
+
 ## 1.0.1
 
 ### Patch Changes
