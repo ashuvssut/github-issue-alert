@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- d6dadcf: feat: add repoName subtitle in Notificationa
+- d6dadcf: feat: add repoName subtitle in Notifications
 
 ## 1.0.3
 
