@@ -7,6 +7,8 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
+import Tooltip from "@mui/material/Tooltip";
 import { useEffect, useMemo, useState } from "react";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
@@ -133,9 +135,17 @@ export function Header() {
           >
             {isRunning ? "Stop" : "Start"}
           </Button>
-          <Typography variant="overline">
-            Status: Polling {isRunning ? "Active" : "Stopped"}
-          </Typography>
+          <Tooltip title="Polling status">
+            <Chip
+              label={
+                <>
+                  <b>Status:</b> {isRunning ? "Active" : "Stopped"}
+                </>
+              }
+              color={isRunning ? "success" : "default"}
+              variant="filled"
+            />
+          </Tooltip>
         </Container>
 
         <Container
