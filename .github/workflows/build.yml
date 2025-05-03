@@ -18,6 +18,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: "yarn"
 
       - name: Force Git to use HTTPS instead of SSH
         run: |
@@ -49,6 +50,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: "yarn"
 
       - name: Force Git to use HTTPS instead of SSH
         run: |
@@ -81,14 +83,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: "yarn"
 
       - name: Force Git to use HTTPS instead of SSH
         run: |
           git config --global url."https://github.com/".insteadOf "git@github.com:"
           git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - name: Install dependencies with retry # Retry logic for Windows because of network issues
+        run: |
+          for i in 1 2 3; do
+            yarn install --frozen-lockfile && break || sleep 10
+          done
 
       - name: Build for Windows
         run: yarn make
