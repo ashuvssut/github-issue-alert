@@ -42,9 +42,6 @@ export const useNotifications = () => {
       // const command = createTerminalNotifierCommand(latestIssue, ownerInfo);
       // const { error } = await window.electronAPI.executeCommand(command);
       // if (error) throw new Error(error);
-      const labels = latestIssue.labels
-        .map((label) => (typeof label === "string" ? label : label.name))
-        .join(", ");
 
       const isSameRepo = latestIssue.html_url.startsWith(
         ownerInfo.current?.html_url
@@ -54,9 +51,19 @@ export const useNotifications = () => {
         ownerInfo.current = newOwnerInfo?.body.owner || null;
       }
 
+      const repoName = getRepoName(latestIssue.repository_url);
+      const bodyPrefix =
+        window.electronAPI.platform !== "darwin" ? `${repoName}\n` : ""; // on macOS, we use subtitle to show repoName instead
+
+      const labels = latestIssue.labels
+        .map((label) => (typeof label === "string" ? label : label.name))
+        .join(", ");
+      const bodySuffix = labels.length > 0 ? ` | ${labels}` : "";
+
       window.electronAPI.showIssueNotification({
         title: latestIssue.title,
-        body: `${latestIssue.user.login} | ${labels}`,
+        body: `${bodyPrefix}${latestIssue.user.login}${bodySuffix}`,
+        subtitle: repoName,
         openUrl: latestIssue.html_url,
         issuesByCreatedAtLink,
         iconUrl: ownerInfo.current?.avatar_url,
@@ -241,6 +248,11 @@ const useGitHubApi = () => {
     config,
     issuesByCreatedAtLink,
   };
+};
+
+export const getRepoName = (url: string) => {
+  const [owner, repo] = url.split("/").slice(-2);
+  return `${owner}/${repo}`;
 };
 
 const createTerminalNotifierCommand = (

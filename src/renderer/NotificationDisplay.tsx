@@ -11,12 +11,13 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import { useNotifications } from "./useNotifications";
+import { getRepoName, useNotifications } from "./useNotifications";
 import Delete from "@mui/icons-material/Delete";
 import OpenInNew from "@mui/icons-material/OpenInNew";
 import { useAtom } from "jotai";
 import { getContrastColors } from "./utils";
 import { settingsAtom } from "./atoms";
+import { Fragment } from "react";
 
 export const NotificationDisplay = () => {
   const { history, deleteNotification, clearHistory, issuesByCreatedAtLink } =
@@ -68,19 +69,19 @@ export const NotificationDisplay = () => {
               weekday: "short",
             }
           );
-          const [owner, repo] = ghIssue.repository_url.split("/").slice(-2);
-          const repoName = `${owner}/${repo}`;
+
+          const repoName = getRepoName(ghIssue.repository_url);
           const showDivider =
             i == 0 || ghIssue.repository_url !== history[i - 1]?.repository_url;
           return (
-            <>
+            <Fragment key={ghIssue.id}>
               {showDivider && (
                 <Box display="flex" alignItems="center">
                   <Chip label={repoName} size="small" />
                   <Divider sx={{ flex: 1, ml: 2 }} />
                 </Box>
               )}
-              <Tooltip title={`Open ${ghIssue.html_url}`} key={ghIssue.id}>
+              <Tooltip title={`Open ${ghIssue.html_url}`}>
                 <Card
                   onClick={() => window.electronAPI.openUrl(ghIssue.html_url)}
                   sx={{
@@ -155,7 +156,7 @@ export const NotificationDisplay = () => {
                   </IconButton>
                 </Card>
               </Tooltip>
-            </>
+            </Fragment>
           );
         })}
 

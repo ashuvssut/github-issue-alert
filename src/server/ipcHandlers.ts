@@ -64,12 +64,14 @@ function serializeHeaders(headers: Headers): Record<string, string> {
 export const showIssueNotification = async ({
   title,
   body,
+  subtitle,
   openUrl,
   issuesByCreatedAtLink,
   iconUrl,
 }: {
   title: string;
   body: string;
+  subtitle?: string;
   openUrl: string;
   issuesByCreatedAtLink: string;
   iconUrl: string;
@@ -98,6 +100,7 @@ export const showIssueNotification = async ({
   const notification = new Notification({
     title,
     body,
+    subtitle,
     icon,
     actions: [{ type: "button", text: "View all issues" }],
     closeButtonText: "Dismiss",
