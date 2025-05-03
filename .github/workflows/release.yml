@@ -1,4 +1,4 @@
-name: Release
+name: Version and Release
 
 on:
   push:
@@ -8,15 +8,12 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release:
-    name: Release
+  version:
+    if: github.repository == 'ashuvssut/github-issue-alert' # optional, to avoid forks
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -25,10 +22,11 @@ jobs:
           git config --global url."https://github.com/".insteadOf "git@github.com:"
           git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
-      - name: Install Dependencies
-        run: yarn
+      - run: yarn install --frozen-lockfile
 
-      - name: Create Release Pull Request
+      - name: Create Release Pull Request or Publish
         uses: changesets/action@v1
+        with:
+          publish: yarn release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
