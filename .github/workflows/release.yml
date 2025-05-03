@@ -1,25 +1,34 @@
-name: Version and Release
+name: Release
 
 on:
   push:
     branches:
       - main
 
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
-  version:
-    if: github.repository == 'ashuvssut/github-issue-alert' # optional, to avoid forks
+  release:
+    name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      - run: yarn install --frozen-lockfile
+      - name: Force Git to use HTTPS instead of SSH
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
-      - name: Create Release Pull Request or Publish
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Create Release Pull Request
         uses: changesets/action@v1
-        with:
-          publish: yarn release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
