@@ -109,13 +109,15 @@ export const useNotifications = () => {
       sessionId,
       isRunning: true,
     }));
-    toast.success("Polling initiated", { toastId: "p-start" });
+    if (!notifications.isRunning)
+      toast.success("Polling initiated", { toastId: "p-start" });
   };
 
   const stopIssueChecking = () => {
     clearInterval(notifications.sessionId);
     setNotifications((prev) => ({ ...prev, isRunning: false, loading: false }));
-    toast.info("Polling stopped", { toastId: "p-stop" });
+    if (notifications.isRunning)
+      toast.info("Polling stopped", { toastId: "p-stop" });
   };
 
   const lastChecked = useMemo(() => {
@@ -162,9 +164,13 @@ const useGitHubApi = () => {
   const [config] = useAtom(configAtom);
   const [owner, repoName] = useMemo(() => {
     if (!config.repo) return ["", ""];
-    const url = new URL(config.repo);
-    const [owner, repoName] = url.pathname.slice(1).split("/");
-    return [owner, repoName];
+    try {
+      const url = new URL(config.repo);
+      const [owner, repoName] = url.pathname.slice(1).split("/");
+      return [owner, repoName];
+    } catch (err) {
+      return ["", ""];
+    }
   }, [config.repo]);
 
   const getIssues = async () => {

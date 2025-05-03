@@ -15,6 +15,11 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     icon: "./assets/logo/icon",
+    appBundleId: "com.stacknide.github-issue-alert",
+    extendInfo: {
+      NSUserNotificationAlertStyle: "alert",
+    },
+    osxSign: {},
   },
   rebuildConfig: {},
   makers: [
