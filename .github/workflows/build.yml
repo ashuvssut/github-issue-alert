@@ -33,7 +33,6 @@ jobs:
       - name: Upload artifact to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          name: macos-${{ matrix.arch }}
           tag_name: ${{ github.event.client_payload.tag }}
           files: |
             out/make/**/*.zip
@@ -65,7 +64,6 @@ jobs:
       - name: Upload artifact to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          name: linux-x64
           tag_name: ${{ github.event.client_payload.tag }}
           files: |
             out/make/**/*.AppImage
@@ -98,7 +96,6 @@ jobs:
       - name: Upload artifact to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          name: windows-x64
           tag_name: ${{ github.event.client_payload.tag }}
           files: |
             out/make/**/*.exe
