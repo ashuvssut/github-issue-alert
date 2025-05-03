@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "release": "changeset tag && git push --follow-tags"
   },
   "keywords": [],
   "author": {
@@ -51,6 +52,7 @@
     "typescript": "~4.5.4"
   },
   "dependencies": {
+    "@changesets/cli": "^2.29.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.2.5",
