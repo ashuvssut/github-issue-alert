@@ -4,6 +4,8 @@ import { useAtom } from "jotai";
 import { configAtom } from "./Header";
 import { atomWithStorage } from "jotai/utils";
 import { toast } from "react-toastify";
+import { useRef } from "react";
+import orderBy from "lodash.orderby";
 
 type GitHubIssueAndPR = components["schemas"]["issue"];
 type GitHubOwner = components["schemas"]["repository"]["owner"];
@@ -25,10 +27,14 @@ export const useNotifications = () => {
   const { config, repo, getIssues, getRepoOwnerInfo, issuesByCreatedAtLink } =
     useGitHubApi();
 
-  const [ownerInfo, setOwnerInfo] = useState<GitHubOwner | null>(null);
+  const ownerInfo = useRef<GitHubOwner | null>(null);
   useEffect(() => {
-    getRepoOwnerInfo().then((res) => res && setOwnerInfo(res.body.owner));
-    return () => setOwnerInfo(null);
+    getRepoOwnerInfo().then((res) => {
+      if (res) ownerInfo.current = res.body.owner;
+    });
+    return () => {
+      ownerInfo.current = null;
+    };
   }, [config.repo]);
 
   async function handleNewIssue(latestIssue: GitHubIssueAndPR) {
@@ -39,12 +45,21 @@ export const useNotifications = () => {
       const labels = latestIssue.labels
         .map((label) => (typeof label === "string" ? label : label.name))
         .join(", ");
+
+      const isSameRepo = latestIssue.html_url.startsWith(
+        ownerInfo.current?.html_url
+      );
+      if (!isSameRepo) {
+        const newOwnerInfo = await getRepoOwnerInfo();
+        ownerInfo.current = newOwnerInfo?.body.owner || null;
+      }
+
       window.electronAPI.showIssueNotification({
         title: latestIssue.title,
         body: `${latestIssue.user.login} | ${labels}`,
         openUrl: latestIssue.html_url,
         issuesByCreatedAtLink,
-        iconUrl: ownerInfo?.avatar_url,
+        iconUrl: ownerInfo.current?.avatar_url,
       });
     } catch (err: any) {
       console.error("Notification failed:", err.message);
@@ -74,22 +89,31 @@ export const useNotifications = () => {
       const issuesOnly = res.body.filter((issue) => !issue.pull_request);
       const latest = issuesOnly[0];
 
-      const isAlreadyPresent = notifications.list.some(
-        (issue) => issue.id === latest?.id
-      );
-
-      if (latest && !isAlreadyPresent && latest.user.type !== "Bot") {
-        const newSortedByCreatedAt = [...notifications.list, latest].sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-        setNotifications((p) => ({ ...p, list: newSortedByCreatedAt }));
-
-        etag = res.headers["etag"] || etag;
-        await handleNewIssue(latest);
+      if (!latest || latest.user.type === "Bot") {
+        setNotifications((p) => ({ ...p, error: null }));
+        return;
       }
 
-      setNotifications((p) => ({ ...p, error: null }));
+      setNotifications((p) => {
+        const isAlreadyPresent = p.list.some((issue) => issue.id === latest.id);
+        if (isAlreadyPresent) return { ...p, error: null };
+
+        const newSortedByCreatedAt = orderBy(
+          [...p.list, latest],
+          [
+            (item) => (item.repository_url === latest.repository_url ? 0 : 1), // priority: same repo first
+            (item) => new Date(item.created_at).getTime(), // then by created_at desc
+          ],
+          ["asc", "desc"]
+        );
+        // update etag
+        etag = res.headers["etag"] || etag;
+
+        // notify outside state update
+        handleNewIssue(latest);
+
+        return { ...p, list: newSortedByCreatedAt, error: null };
+      });
     } catch (err: any) {
       console.error("Request failed:", err.message);
       setNotifications((p) => ({
