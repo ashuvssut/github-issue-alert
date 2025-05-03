@@ -14,11 +14,10 @@ import IconButton from "@mui/material/IconButton";
 import { useNotifications } from "./useNotifications";
 import Delete from "@mui/icons-material/Delete";
 import OpenInNew from "@mui/icons-material/OpenInNew";
-import { atomWithStorage } from "jotai/utils";
 import { useAtom } from "jotai";
 import { getContrastColors } from "./utils";
+import { settingsAtom } from "./atoms";
 
-const settingsAtom = atomWithStorage("settings", { compactView: false });
 export const NotificationDisplay = () => {
   const { history, deleteNotification, clearHistory, issuesByCreatedAtLink } =
     useNotifications();

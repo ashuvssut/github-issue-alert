@@ -1,4 +1,5 @@
 import {
+  AppPathName,
   ExectueCommand,
   executeCommand,
   serializedFetch,
@@ -6,7 +7,7 @@ import {
   showIssueNotification,
   ShowIssueNotification,
 } from "./ipcHandlers";
-import { ipcMain, shell } from "electron";
+import { app, ipcMain, shell } from "electron";
 
 export const initIpc = () => {
   ipcMain.handle(
@@ -33,4 +34,8 @@ export const initIpc = () => {
       showIssueNotification(args);
     }
   );
+
+  ipcMain.handle("appGetPath", (_event, pathName: AppPathName) => {
+    return app.getPath(pathName);
+  });
 };

@@ -1,10 +1,11 @@
 import { createRoot } from "react-dom/client";
 import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
+import { useAtomValue } from "jotai";
 import { Header } from "./Header";
+import { Settings } from "./Settings";
 import { NotificationDisplay } from "./NotificationDisplay";
 import { ToastContainer } from "react-toastify";
+import { settingsAtom } from "./atoms";
 
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -27,11 +28,8 @@ const darkTheme = createTheme({
   },
 });
 
-export const themeAtom = atomWithStorage("theme", "dark" as "light" | "dark");
-
 const App = () => {
-  const [theme] = useAtom(themeAtom);
-
+  const theme = useAtomValue(settingsAtom).theme;
   const themeObj = theme === "dark" ? darkTheme : lightTheme;
 
   return (
@@ -39,7 +37,8 @@ const App = () => {
       <CssBaseline />
       <Header />
       <NotificationDisplay />
-      <ToastContainer position="bottom-right"/>
+      <Settings />
+      <ToastContainer position="bottom-right" />
     </ThemeProvider>
   );
 };

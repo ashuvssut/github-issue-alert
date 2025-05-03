@@ -3,6 +3,7 @@
 
 import { contextBridge, ipcRenderer } from "electron";
 import type {
+  AppPathName,
   ExectueCommand,
   SerializedFetch,
   ShowIssueNotification,
@@ -16,6 +17,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   openUrl: (url: string) => ipcRenderer.invoke("openUrl", url),
   showIssueNotification: (args: Parameters<ShowIssueNotification>[0]) =>
     ipcRenderer.invoke("showIssueNotification", args),
+  appGetPath: (pathName: AppPathName) =>
+    ipcRenderer.invoke("appGetPath", pathName),
+  platform: process.platform,
 });
 
 declare global {
@@ -25,6 +29,8 @@ declare global {
       ipcFetch: SerializedFetch;
       openUrl: (url: string) => void;
       showIssueNotification: ShowIssueNotification;
+      appGetPath: (pathName: AppPathName) => string;
+      platform: NodeJS.Platform;
     };
   }
 }

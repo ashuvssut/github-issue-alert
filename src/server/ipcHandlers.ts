@@ -1,4 +1,4 @@
-import { Notification, shell } from "electron";
+import { app, Notification, shell } from "electron";
 import { exec } from "child_process";
 import util from "util";
 import fetch, { RequestInit, RequestInfo, Headers } from "node-fetch";
@@ -116,3 +116,5 @@ export const showIssueNotification = async ({
   notification.show();
 };
 export type ShowIssueNotification = typeof showIssueNotification;
+
+export type AppPathName = Parameters<typeof app.getPath>[0];
