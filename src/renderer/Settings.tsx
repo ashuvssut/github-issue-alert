@@ -19,6 +19,7 @@ import FormControl from "@mui/material/FormControl";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { toast } from "react-toastify";
+import { SupportMe } from "./SupportMe";
 
 export const Settings = () => {
   const [open, setOpen] = useState(false);
@@ -54,6 +55,7 @@ export const Settings = () => {
       >
         <Box sx={{ p: 2, height: "70vh" }} role="presentation">
           <SettingsContent />
+          <SupportMe />
         </Box>
       </SwipeableDrawer>
     </>
