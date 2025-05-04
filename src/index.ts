@@ -14,7 +14,10 @@ if (require("electron-squirrel-startup")) {
 
 const createWindow = (): void => {
   initIpc();
-  // Create the browser window.
+
+  const isDev = process.env.NODE_ENV === "development";
+  const titleSuffix = isDev ? `(Dev Build v${app.getVersion()})` : "";
+
   const mainWindow = new BrowserWindow({
     height: 600,
     width: 800,
@@ -22,14 +25,13 @@ const createWindow = (): void => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
     icon: "./../assets/logo/icon.png",
+    title: `GitHub Issue Alerts ${titleSuffix}`,
   });
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
-  if (process.env.NODE_ENV === "development") {
-    mainWindow.webContents.openDevTools();
-  }
+  if (isDev) mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
