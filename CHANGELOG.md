@@ -1,5 +1,15 @@
 # github-issue-alert
 
+## 1.0.5
+
+### Patch Changes
+
+- 4e10897: Bug fixes and UX improvements
+
+  - sorted Issue will now filter out Bot created issues
+  - Fix app crash when closing and reopening app on macOS
+  - Various other UX improvements
+
 ## 1.0.4
 
 ### Patch Changes
