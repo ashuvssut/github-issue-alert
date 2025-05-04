@@ -1,5 +1,11 @@
 # github-issue-alert
 
+## 1.0.4
+
+### Patch Changes
+
+- d6dadcf: feat: add repoName subtitle in Notifications
+
 ## 1.0.3
 
 ### Patch Changes
