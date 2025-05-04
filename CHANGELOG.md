@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- 4e10897: Bug fixes and UX improvements
+- 6476243: Bug fixes and UX improvements
 
   - sorted Issue will now filter out Bot created issues
   - Fix app crash when closing and reopening app on macOS
