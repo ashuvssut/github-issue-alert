@@ -11,13 +11,14 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import { getRepoName, useNotifications } from "./useNotifications";
+import { getRepoSlug, useNotifications } from "./useNotifications";
 import Delete from "@mui/icons-material/Delete";
 import OpenInNew from "@mui/icons-material/OpenInNew";
 import { useAtom } from "jotai";
 import { getContrastColors } from "./utils";
 import { settingsAtom } from "./atoms";
 import { Fragment } from "react";
+import Info from "@mui/icons-material/InfoOutline";
 
 export const NotificationDisplay = () => {
   const { history, deleteNotification, clearHistory, issuesByCreatedAtLink } =
@@ -27,10 +28,14 @@ export const NotificationDisplay = () => {
   return (
     <Stack sx={{ mt: 2, px: 3, height: "100%", gap: 2, minHeight: "100vh" }}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="h4" mr={1}>
+        <Typography variant="h4" gap={1} display="flex" alignItems="center">
           History
+          <Tooltip title="Notification History shows issues sorted by creation time. PRs and Bot issues are ignored. Always shows the latest past issue.">
+            <Info />
+          </Tooltip>
         </Typography>
         <IconButton
+          sx={{ ml: 1 }}
           onClick={(e) => {
             e.stopPropagation();
             window.electronAPI.openUrl(issuesByCreatedAtLink);
@@ -70,14 +75,22 @@ export const NotificationDisplay = () => {
             }
           );
 
-          const repoName = getRepoName(ghIssue.repository_url);
+          const repoSlug = getRepoSlug(ghIssue.repository_url);
           const showDivider =
             i == 0 || ghIssue.repository_url !== history[i - 1]?.repository_url;
           return (
             <Fragment key={ghIssue.id}>
               {showDivider && (
                 <Box display="flex" alignItems="center">
-                  <Chip label={repoName} size="small" />
+                  <Chip
+                    label={repoSlug}
+                    size="small"
+                    onClick={() => {
+                      window.electronAPI.openUrl(
+                        `https://github.com/${repoSlug}`
+                      );
+                    }}
+                  />
                   <Divider sx={{ flex: 1, ml: 2 }} />
                 </Box>
               )}

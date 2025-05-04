@@ -19,8 +19,6 @@ const notificationsAtom = atomWithStorage("notifications", {
   isRunning: false,
 });
 
-let etag: string | null = null;
-
 export const useNotifications = () => {
   const [notifications, setNotifications] = useAtom(notificationsAtom);
 
@@ -51,9 +49,9 @@ export const useNotifications = () => {
         ownerInfo.current = newOwnerInfo?.body.owner || null;
       }
 
-      const repoName = getRepoName(latestIssue.repository_url);
+      const repoSlug = getRepoSlug(latestIssue.repository_url);
       const bodyPrefix =
-        window.electronAPI.platform !== "darwin" ? `${repoName}\n` : ""; // on macOS, we use subtitle to show repoName instead
+        window.electronAPI.platform !== "darwin" ? `${repoSlug}\n` : ""; // on macOS, we use subtitle to show repoName instead
 
       const labels = latestIssue.labels
         .map((label) => (typeof label === "string" ? label : label.name))
@@ -63,7 +61,7 @@ export const useNotifications = () => {
       window.electronAPI.showIssueNotification({
         title: latestIssue.title,
         body: `${bodyPrefix}${latestIssue.user.login}${bodySuffix}`,
-        subtitle: repoName,
+        subtitle: repoSlug,
         openUrl: latestIssue.html_url,
         issuesByCreatedAtLink,
         iconUrl: ownerInfo.current?.avatar_url,
@@ -93,10 +91,12 @@ export const useNotifications = () => {
 
       if (!res.ok) throw new Error(`GitHub API error: ${res.statusText}`);
 
-      const issuesOnly = res.body.filter((issue) => !issue.pull_request);
-      const latest = issuesOnly[0];
+      const nonBotIssuesOnly = res.body.filter(
+        (issue) => !issue.pull_request && issue.user.type !== "Bot"
+      );
 
-      if (!latest || latest.user.type === "Bot") {
+      const latest = nonBotIssuesOnly[0];
+      if (!latest) {
         setNotifications((p) => ({ ...p, error: null }));
         return;
       }
@@ -191,6 +191,7 @@ export const useNotifications = () => {
   };
 };
 
+let etag: string | null = null;
 const useGitHubApi = () => {
   const [config] = useAtom(configAtom);
   const [owner, repoName] = useMemo(() => {
@@ -210,7 +211,7 @@ const useGitHubApi = () => {
     if (authToken) headers.Authorization = `token ${authToken}`;
     if (etag) headers["If-None-Match"] = etag;
     const res = await window.electronAPI.ipcFetch(
-      `https://api.github.com/repos/${owner}/${repoName}/issues?sort=created&direction=desc&per_page=5`,
+      `https://api.github.com/repos/${owner}/${repoName}/issues?sort=created&direction=desc`,
       { headers }
     );
     return {
@@ -250,8 +251,8 @@ const useGitHubApi = () => {
   };
 };
 
-export const getRepoName = (url: string) => {
-  const [owner, repo] = url.split("/").slice(-2);
+export const getRepoSlug = (repository_url: string) => {
+  const [owner, repo] = repository_url.split("/").slice(-2);
   return `${owner}/${repo}`;
 };
 
